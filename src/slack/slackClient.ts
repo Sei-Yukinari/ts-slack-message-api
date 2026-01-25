@@ -2,6 +2,7 @@ import axios from 'axios'
 import { SlackMessage } from '../messages'
 import logger from '../logger'
 import { SlackAPIError } from '../errors'
+import { retry } from './retry'
 
 export const sendSlackMessages = async (
   messages: SlackMessage[],
@@ -9,7 +10,7 @@ export const sendSlackMessages = async (
 ): Promise<void> => {
   for (const message of messages) {
     try {
-      await axios.post(webhookUrl, message)
+      await retry(() => axios.post(webhookUrl, message), 3, 1000, 2)
       logger.info({ message }, 'Slack message sent')
     } catch (error: unknown) {
       logger.error({ err: error, message }, 'Failed to send Slack message')
