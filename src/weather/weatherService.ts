@@ -1,5 +1,6 @@
 import axios from 'axios'
 import logger from '../logger'
+import { WeatherAPIError } from '../errors'
 
 export interface WeatherInfo {
   weather: string // 天気（晴れ、曇り、雨など）
@@ -71,8 +72,8 @@ export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
       tempMin: tempMin,
       tempMax: tempMax,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error({ err: error }, 'Failed to fetch weather from Open-Meteo')
-    return null
+    throw new WeatherAPIError('Failed to fetch weather from Open-Meteo', error)
   }
 }

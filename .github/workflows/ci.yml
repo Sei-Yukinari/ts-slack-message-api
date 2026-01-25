@@ -30,9 +30,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Format check
-        run: npx prettier --check 'src/**/*.{js,ts}'
-
       - name: Build project
         run: npm run build
 

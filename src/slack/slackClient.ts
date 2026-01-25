@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { SlackMessage } from '../messages'
 import logger from '../logger'
+import { SlackAPIError } from '../errors'
 
 export const sendSlackMessages = async (
   messages: SlackMessage[],
@@ -10,8 +11,9 @@ export const sendSlackMessages = async (
     try {
       await axios.post(webhookUrl, message)
       logger.info({ message }, 'Slack message sent')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error({ err: error, message }, 'Failed to send Slack message')
+      throw new SlackAPIError('Failed to send Slack message', error)
     }
   }
 }
