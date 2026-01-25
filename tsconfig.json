@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                   // コンパイル結果のJavaScriptのバージョン
+    "module": "commonjs",               // Node.js用のモジュールシステム
+    "strict": true,                     // 厳格な型チェック
+    "esModuleInterop": true,            // ESモジュールとCommonJSの互換性をサポート
+    "outDir": "./dist",                 // 出力フォルダ
+    "rootDir": "./src"                  // ソースファイルのディレクトリ
+  },
+  "include": ["src"],                   // コンパイル対象のディレクトリ
+  "exclude": ["node_modules"]           // 除外するディレクトリ
+}
