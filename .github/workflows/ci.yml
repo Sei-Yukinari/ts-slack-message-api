@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 24]
 
     steps:
       - name: Checkout repository
@@ -19,16 +22,25 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npx prettier --check 'src/**/*.{js,ts}'
 
       - name: Build project
         run: npm run build
 
       - name: Run tests
         run: npm test
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate || true
 
       - name: Upload logs on failure
         if: failure()

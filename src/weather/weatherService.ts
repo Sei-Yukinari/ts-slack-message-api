@@ -49,21 +49,19 @@ const getWeatherFromWMOCode = (code: number): string => {
   return weatherMap[code] || '天気不明'
 }
 
-export const getWeather = async (
-  date: Date
-): Promise<WeatherInfo | null> => {
+export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
   try {
     const response = await axios.get(OPEN_METEO_API_URL)
-    
+
     const daily = response.data.daily
-    
+
     // 指定された日付に対応するインデックスを見つける
     const targetDateStr = date.toISOString().split('T')[0] // YYYY-MM-DD形式
     const dateIndex = daily.time.findIndex((d: string) => d === targetDateStr)
-    
+
     // 該当する日付が見つからない場合は最初の日（今日）を使用
     const index = dateIndex >= 0 ? dateIndex : 0
-    
+
     const weatherCode = daily.weather_code[index]
     const tempMin = Math.round(daily.temperature_2m_min[index] * 10) / 10
     const tempMax = Math.round(daily.temperature_2m_max[index] * 10) / 10

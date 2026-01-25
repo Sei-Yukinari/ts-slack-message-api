@@ -16,7 +16,7 @@ import logger from './logger'
 
 export const createMessages = (
   date: Date,
-  weather?: WeatherInfo | null
+  weather?: WeatherInfo | null,
 ): SlackMessage[] => {
   let dateString: string
   try {
@@ -44,7 +44,9 @@ export const createMessages = (
   messages.push({ text: '*------------下校------------*' })
   messages.push({ attachments: [{ color: '#e01e5a', text: '「車」' }] }) // 赤
   messages.push({ attachments: [{ color: '#2eb886', text: '「歩き」' }] }) // 青
-  messages.push({ attachments: [{ color: '#2e4ab8', text: '「歩き(フジ精機)」' }] }) // 青
+  messages.push({
+    attachments: [{ color: '#2e4ab8', text: '「歩き(フジ精機)」' }],
+  }) // 青
 
   if (isWednesday) {
     messages.push({ attachments: [{ color: '#a63693', text: 'ひこうせん✈' }] }) // 紫

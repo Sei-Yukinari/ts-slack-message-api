@@ -4,7 +4,7 @@ import logger from '../logger'
 
 export const sendSlackMessages = async (
   messages: SlackMessage[],
-  webhookUrl: string
+  webhookUrl: string,
 ): Promise<void> => {
   for (const message of messages) {
     try {

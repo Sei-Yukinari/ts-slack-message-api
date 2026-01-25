@@ -1,14 +1,12 @@
-import * as dotenv from 'dotenv'
 import logger from './logger'
 import { isHoliday } from './holidayUtils'
 import { createMessages } from './messages'
 import { sendSlackMessages } from './slack/slackClient'
 import { getWeather } from './weather/weatherService'
+import { requireEnv } from './config/config'
 
-dotenv.config()
-
-// Slack Webhook URL
-const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL || ''
+// Slack Webhook URL（必須）
+const slackWebhookUrl = requireEnv('SLACK_WEBHOOK_URL')
 
 // メッセージを送信
 const broadcastMessage = async (date: Date) => {
@@ -27,7 +25,9 @@ logger.info(today.toISOString())
 if (!isHoliday(today)) {
   broadcastMessage(today)
     .then(() => logger.info('Done!'))
-    .catch((error) => logger.error({ err: error }, 'Error broadcasting message'))
+    .catch((error) =>
+      logger.error({ err: error }, 'Error broadcasting message'),
+    )
 } else {
   logger.info('Today is holiday.')
 }
