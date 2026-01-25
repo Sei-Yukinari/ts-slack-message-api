@@ -1,4 +1,5 @@
 import axios from 'axios'
+import logger from '../logger'
 
 export interface WeatherInfo {
   weather: string // 天気（晴れ、曇り、雨など）
@@ -73,7 +74,7 @@ export const getWeather = async (
       tempMax: tempMax,
     }
   } catch (error) {
-    console.error('Failed to fetch weather from Open-Meteo:', error)
+    logger.error({ err: error }, 'Failed to fetch weather from Open-Meteo')
     return null
   }
 }

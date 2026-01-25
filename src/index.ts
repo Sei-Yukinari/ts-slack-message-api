@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import logger from './logger'
 import { isHoliday } from './holidayUtils'
 import { createMessages } from './messages'
 import { sendSlackMessages } from './slack/slackClient'
@@ -21,12 +22,12 @@ const broadcastMessage = async (date: Date) => {
 const today = new Date()
 today.setDate(today.getDate() + 1) // 前日に送るので+1
 today.setHours(today.getHours() + 9) // JSTに変換
-console.log(today.toISOString())
+logger.info(today.toISOString())
 // 休みならメッセージを送信しない
 if (!isHoliday(today)) {
   broadcastMessage(today)
-    .then(() => console.log('Done!'))
-    .catch((error) => console.error('Error:', error))
+    .then(() => logger.info('Done!'))
+    .catch((error) => logger.error({ err: error }, 'Error broadcasting message'))
 } else {
-  console.log('Today is holiday.')
+  logger.info('Today is holiday.')
 }

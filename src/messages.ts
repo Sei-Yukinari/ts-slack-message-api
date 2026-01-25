@@ -12,14 +12,22 @@ export interface WeatherInfo {
   tempMax: number
 }
 
+import logger from './logger'
+
 export const createMessages = (
   date: Date,
   weather?: WeatherInfo | null
 ): SlackMessage[] => {
-  const dateString = date.toLocaleDateString('ja-JP', {
-    day: 'numeric',
-    weekday: 'short',
-  })
+  let dateString: string
+  try {
+    dateString = date.toLocaleDateString('ja-JP', {
+      day: 'numeric',
+      weekday: 'short',
+    })
+  } catch (error) {
+    logger.error({ err: error, date }, 'Failed to format date')
+    dateString = date.toISOString()
+  }
   const isWednesday = date.getDay() === 3
 
   const messages: SlackMessage[] = []
