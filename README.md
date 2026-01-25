@@ -23,8 +23,12 @@ TypeScript と Slack Incoming Webhook を用いてメッセージを (手動 / �
     npm run build
 ```
 
-## 環境変数
+## 環境変数・環境別設定
 ローカルでは `.env` (必要なら追加) または実行時に環境変数指定。GitHub Actions では Secrets を利用。
+
+- `src/config/config.dev.ts` ... 開発用設定
+- `src/config/config.prod.ts` ... 本番用設定
+- `NODE_ENV` で切り替え（例: `NODE_ENV=production`）
 
 例 (.env):
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
@@ -43,10 +47,17 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 | 時刻ずれ | cron は常に UTC 指定か再確認 |
 | TypeError | 環境変数未設定 (.env / Secrets) |
 
-## セキュリティ
+## セキュリティ・Secretsローテーション手順
 - Webhook URL は必ず Secrets / .env に保持
 - ログへ機密値を出力しない
 - 不要になった Webhook は Slack で無効化
+
+### Secretsローテーション手順
+1. Slackで新しいWebhook URLを発行
+2. GitHubリポジトリのSettings > Secretsで`SLACK_WEBHOOK_URL`を新しい値に更新
+3. `.env`ファイルも同様に更新（ローカル開発時）
+4. 古いWebhookはSlack管理画面で無効化
+5. 必要に応じてCI/CDを再実行し、正常動作を確認
 
 ## ライセンス
 本プロジェクトは MIT License の下で提供されます。詳細は `LICENSE` を参照してください。

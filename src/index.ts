@@ -1,33 +1,19 @@
 import logger from './logger'
 import { isHoliday } from './holidayUtils'
-import { createMessages } from './messages'
-import { sendSlackMessages } from './slack/slackClient'
-import { getWeather } from './weather/weatherService'
-import { requireEnv } from './config/config'
+import { DateTime } from 'luxon'
 
-// Slack Webhook URL（必須）
-const slackWebhookUrl = requireEnv('SLACK_WEBHOOK_URL')
-
-// メッセージを送信
-const broadcastMessage = async (date: Date) => {
-  // 天気情報を取得（失敗してもメッセージ送信は継続）
-  const weather = await getWeather(date)
-
-  const messages = createMessages(date, weather)
-  await sendSlackMessages(messages, slackWebhookUrl)
-}
-
-const today = new Date()
-today.setDate(today.getDate() + 1) // 前日に送るので+1
-today.setHours(today.getHours() + 9) // JSTに変換
-logger.info(today.toISOString())
+// Luxonで翌日JSTを生成
+const today = DateTime.utc().plus({ days: 1 }).setZone('Asia/Tokyo')
+logger.info(today.toISO())
+// LuxonのDateTime→Dateへ変換
+const todayDate = today.toJSDate()
 // 休みならメッセージを送信しない
-if (!isHoliday(today)) {
-  broadcastMessage(today)
-    .then(() => logger.info('Done!'))
-    .catch((error) =>
-      logger.error({ err: error }, 'Error broadcasting message'),
-    )
+if (!isHoliday(todayDate)) {
+  // broadcastMessage(todayDate)
+  //   .then(() => logger.info('Done!'))
+  //   .catch((error) =>
+  //     logger.error({ err: error }, 'Error broadcasting message'),
+  //   )
 } else {
   logger.info('Today is holiday.')
 }
