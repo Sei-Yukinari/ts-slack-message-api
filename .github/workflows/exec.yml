@@ -25,7 +25,10 @@ jobs:
         run: npm run build
 
       - name: Run npm start
-        run: SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} npm start
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
+        run: npm start
 
       - name: Upload logs on failure
         if: failure()
