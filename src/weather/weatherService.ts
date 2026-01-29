@@ -5,78 +5,39 @@ import { fromDate } from '../dates'
 
 export interface WeatherInfo {
   weather: string // 天気（晴れ、曇り、雨など）
-  tempMin: number // 最低気温
-  tempMax: number // 最高気温
+  temp: number // 気温
 }
 
 // 富士見町の座標
-const FUJIMI_LAT = 35.914
-const FUJIMI_LON = 138.239
-
-// Open-Meteo API URL
-const OPEN_METEO_API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${FUJIMI_LAT}&longitude=${FUJIMI_LON}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia/Tokyo`
-
-// WMO天気コードを日本語に変換
-const getWeatherFromWMOCode = (code: number): string => {
-  const weatherMap: { [key: number]: string } = {
-    0: '☀️快晴',
-    1: '☀️晴れ',
-    2: '⛅️晴れ時々曇り',
-    3: '☁️曇り',
-    45: '🌫霧',
-    48: '🌫霧',
-    51: '🌧小雨',
-    53: '🌧小雨',
-    55: '🌧雨',
-    56: '🌧みぞれ',
-    57: '🌧みぞれ',
-    61: '🌧小雨',
-    63: '🌧雨',
-    65: '🌧大雨',
-    66: '🌧みぞれ',
-    67: '🌧みぞれ',
-    71: '❄️小雪',
-    73: '❄️雪',
-    75: '❄️大雪',
-    77: '❄️雪',
-    80: '🌦にわか雨',
-    81: '🌦にわか雨',
-    82: '🌦激しいにわか雨',
-    85: '❄️にわか雪',
-    86: '❄️にわか雪',
-    95: '⛈雷雨',
-    96: '⛈雷雨',
-    99: '⛈激しい雷雨',
-  }
-  return weatherMap[code] || '天気不明'
-}
+const FUJIMI_LAT = 35.9341
+const FUJIMI_LON = 138.2930
+import { config } from '../config/config.dev'
 
 export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
   try {
-    const response = await axios.get(OPEN_METEO_API_URL)
-
-    const daily = response.data.daily
-
-    // 指定された日付に対応するインデックスを見つける
-    // date を Luxonで JSTに変換して YYYY-MM-DD 形式を作る
     const dt = fromDate(date)
-    const targetDateStr = dt.toISODate()
-    const dateIndex = daily.time.findIndex((d: string) => d === targetDateStr)
-
-    // 該当する日付が見つからない場合は最初の日（今日）を使用
-    const index = dateIndex >= 0 ? dateIndex : 0
-
-    const weatherCode = daily.weather_code[index]
-    const tempMin = Math.round(daily.temperature_2m_min[index] * 10) / 10
-    const tempMax = Math.round(daily.temperature_2m_max[index] * 10) / 10
-
+    const targetDateStr = dt.toISODate() // YYYY-MM-DD
+    const apiKey = config.openWeatherMapApiKey
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${FUJIMI_LAT}&lon=${FUJIMI_LON}&units=metric&lang=ja&appid=${apiKey}`
+    const response = await axios.get(url)
+    const list = response.data.list
+    // 指定日付06:00のデータを抽出
+    const target = list.find((item: any) => item.dt_txt === `${targetDateStr} 06:00:00`)
+    if (!target) {
+      logger.error({ date: targetDateStr }, 'No 06:00 weather data for this date')
+      return null
+    }
+    console.dir(target)
+    const temp = Math.round(target.main.temp * 10) / 10
+    const weather = target.weather[0].description
+    console.log(weather, temp)
     return {
-      weather: getWeatherFromWMOCode(weatherCode),
-      tempMin: tempMin,
-      tempMax: tempMax,
+      weather,
+      temp,
     }
   } catch (error: unknown) {
-    logger.error({ err: error }, 'Failed to fetch weather from Open-Meteo')
-    throw new WeatherAPIError('Failed to fetch weather from Open-Meteo', error)
+    logger.error({ err: error }, 'Failed to fetch weather from OpenWeatherMap')
+    throw new WeatherAPIError('Failed to fetch weather from OpenWeatherMap', error)
   }
 }
+

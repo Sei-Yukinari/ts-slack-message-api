@@ -8,8 +8,7 @@ export interface SlackMessage {
 
 export interface WeatherInfo {
   weather: string
-  tempMin: number
-  tempMax: number
+  temp: number
 }
 
 import logger from './logger'
@@ -36,7 +35,7 @@ export const createMessages = (
   // <!channel>を一番上に配置
   let headerText = `<!channel>\n${dateString} *------登校------*`
   if (weather) {
-    headerText += `\n${weather.weather} 🌡${weather.tempMin}℃〜${weather.tempMax}℃`
+    headerText += `\n${weather.weather} 🌡${weather.temp}℃（06:00時点）`
   }
 
   messages.push({ text: headerText })
