@@ -1,6 +1,7 @@
 import axios from 'axios'
 import logger from '../logger'
 import { WeatherAPIError } from '../errors'
+import { fromDate } from '../dates'
 
 export interface WeatherInfo {
   weather: string // 天気（晴れ、曇り、雨など）
@@ -57,7 +58,9 @@ export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
     const daily = response.data.daily
 
     // 指定された日付に対応するインデックスを見つける
-    const targetDateStr = date.toISOString().split('T')[0] // YYYY-MM-DD形式
+    // date を Luxonで JSTに変換して YYYY-MM-DD 形式を作る
+    const dt = fromDate(date)
+    const targetDateStr = dt.toISODate()
     const dateIndex = daily.time.findIndex((d: string) => d === targetDateStr)
 
     // 該当する日付が見つからない場合は最初の日（今日）を使用

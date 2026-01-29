@@ -1,11 +1,14 @@
 import holiday_jp from '@holiday-jp/holiday_jp'
 import { schoolSpecificHolidays, vacationPeriods } from './config/holidays'
+import { getMonth, getDay, fromDate } from './dates'
 
 export const isHoliday = (date: Date): boolean => {
+  const dt = fromDate(date)
+
   if (holiday_jp.isHoliday(date)) return true
 
-  const month = date.getMonth() + 1
-  const day = date.getDate()
+  const month = getMonth(dt)
+  const day = getDay(dt)
 
   if (schoolSpecificHolidays.includes(`${month}-${day}`)) return true
 

@@ -13,22 +13,23 @@ export interface WeatherInfo {
 }
 
 import logger from './logger'
+import { fromDate } from './dates'
 
 export const createMessages = (
   date: Date,
   weather?: WeatherInfo | null,
 ): SlackMessage[] => {
+  // date を Luxon DateTime に変換して操作
+  const dt = fromDate(date)
+
   let dateString: string
   try {
-    dateString = date.toLocaleDateString('ja-JP', {
-      day: 'numeric',
-      weekday: 'short',
-    })
+    dateString = dt.setLocale('ja').toFormat("d(EEE)")
   } catch (error) {
     logger.error({ err: error, date }, 'Failed to format date')
     dateString = date.toISOString()
   }
-  const isWednesday = date.getDay() === 3
+  const isWednesday = dt.weekday === 3
 
   const messages: SlackMessage[] = []
 
