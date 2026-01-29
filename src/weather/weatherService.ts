@@ -10,7 +10,7 @@ export interface WeatherInfo {
 
 // 富士見町の座標
 const FUJIMI_LAT = 35.9341
-const FUJIMI_LON = 138.2930
+const FUJIMI_LON = 138.293
 import { config } from '../config/config.dev'
 
 export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
@@ -22,9 +22,18 @@ export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
     const response = await axios.get(url)
     const list = response.data.list
     // 指定日付06:00のデータを抽出
-    const target = list.find((item: any) => item.dt_txt === `${targetDateStr} 06:00:00`)
+    const target = list.find(
+      (item: {
+        dt_txt: string
+        main: { temp: number }
+        weather: { description: string }[]
+      }) => item.dt_txt === `${targetDateStr} 06:00:00`,
+    )
     if (!target) {
-      logger.error({ date: targetDateStr }, 'No 06:00 weather data for this date')
+      logger.error(
+        { date: targetDateStr },
+        'No 06:00 weather data for this date',
+      )
       return null
     }
     console.dir(target)
@@ -37,7 +46,9 @@ export const getWeather = async (date: Date): Promise<WeatherInfo | null> => {
     }
   } catch (error: unknown) {
     logger.error({ err: error }, 'Failed to fetch weather from OpenWeatherMap')
-    throw new WeatherAPIError('Failed to fetch weather from OpenWeatherMap', error)
+    throw new WeatherAPIError(
+      'Failed to fetch weather from OpenWeatherMap',
+      error,
+    )
   }
 }
-
