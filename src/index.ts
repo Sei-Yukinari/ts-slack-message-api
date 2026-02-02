@@ -8,6 +8,7 @@ import { config } from './config/config.dev'
 
 async function broadcastMessage(date: Date) {
   const weather = await getWeather(date)
+  console.dir(weather)
   const messages = createMessages(date, weather)
   const slackWebhookUrl = config.slackWebhookUrl
   try {
