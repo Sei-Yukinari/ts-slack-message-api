@@ -19,9 +19,9 @@ async function broadcastMessage(date: Date) {
   }
 }
 
-// コマンドライン引数で日付指定（YYYY-MM-DD）、なければ今日
+// コマンドライン引数で日付指定（YYYY-MM-DD）、なければ明日
 const argDate = process.argv[2]
-const dt = argDate ? DateTime.fromISO(argDate, { zone: 'Asia/Tokyo' }) : DateTime.now().setZone('Asia/Tokyo');
+const dt = argDate ? DateTime.fromISO(argDate, { zone: 'Asia/Tokyo' }) : DateTime.now().setZone('Asia/Tokyo').plus({ days: 1 });
 const date: Date = dt.toJSDate();
 
 (async () => {
